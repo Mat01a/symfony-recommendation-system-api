@@ -16,10 +16,8 @@ class ProductController extends AbstractController
     {
         $requestBody = json_decode($request->getContent(), false);
         
-        $user = $user->getUserIdentifier();
         return $this->json([
             'message' => 'Welcome to your new controller!',
-            'user' => $user,
             'path' => 'src/Controller/ProductController.php',
         ]);
     }
