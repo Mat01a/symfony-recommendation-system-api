@@ -2,10 +2,22 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Get;
+use App\Controller\ProductController;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ApiResource(operations: [
+    new Get(),
+    new Post(
+        name: 'app_product',
+        uriTemplate: '/products',
+        controller: ProductController::class
+    )
+])]
 class Product
 {
     #[ORM\Id]
@@ -49,7 +61,7 @@ class Product
 
         return $this;
     }
-
+    
     public function getName(): string
     {
         return $this->name;

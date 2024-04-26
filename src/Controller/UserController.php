@@ -44,6 +44,13 @@ class UserController extends AbstractController
         }
         catch(\Exception $e)
         {
+            if ($e !== null)
+            {
+                return $this->json([
+                    'error' => $e
+                ]);
+            }
+            
             return $this->json([
                 'message' => 'This email is already used'
             ], 400);
