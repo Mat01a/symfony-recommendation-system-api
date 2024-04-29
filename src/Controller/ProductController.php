@@ -33,6 +33,10 @@ class ProductController extends AbstractController
         $product->setUser($user);
 
         $errors = $validator->validate($product);
+        
+        $entityManager->persist($product);
+        $entityManager->flush();
+
         return $this->json([
             'message' => 'Welcome to your new controller!',
             'new_product' => [

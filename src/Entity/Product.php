@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Get;
 use App\Controller\ProductController;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource(operations: [
@@ -25,10 +26,12 @@ class Product
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: "Please enter rate")]
     #[ORM\Column]
     private ?int $rate = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Please enter product name")]
     private string $name;        
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'products')]

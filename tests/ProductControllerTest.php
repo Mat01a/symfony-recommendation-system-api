@@ -35,9 +35,10 @@ class ProductControllerTest extends ApiTestCase
 
         # Create a product
         $client->request('POST', '/api/products', ['json' => [
-            'name' => 'abc',
+            'name' => 'Test product',
             "rate" => 5
         ]]);
+
 
         $this->assertSame(200, $client->getResponse()->getStatusCode());
 
