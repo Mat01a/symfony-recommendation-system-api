@@ -32,7 +32,7 @@ class ProductController extends AbstractController
         $user = $entityManager->getRepository(User::class)->find($currentUser->getId());
         $product->setUser($user);
 
-        $errors = $validator->validate($product);
+        $validator->validate($product);
         
         $entityManager->persist($product);
         $entityManager->flush();

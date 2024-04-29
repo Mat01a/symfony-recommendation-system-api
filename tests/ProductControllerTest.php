@@ -12,23 +12,10 @@ class ProductControllerTest extends ApiTestCase
     {
         $client = static::createClient();
 
-        /*
-        $body = [
-            "username" => "test@email.com",
-            "password" => "password"
-        ];
-
-        # Get Token
-        $client->request('POST', '/api/login_check', ['json' => $body]);
-
-        $token = json_decode($client->getResponse()->getcontent(), true);
-        #dd($token->token);
-        */
         $userRepository = static::getContainer()->get(UserRepository::class);
         $user = $userRepository->findOneByEmail('test@email.com');
         $client->loginUser($user);
 
-        #dd($client);
         $product = [
             "rate" => 3,
         ];
