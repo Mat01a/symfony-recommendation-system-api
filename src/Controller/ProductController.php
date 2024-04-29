@@ -9,13 +9,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\User;
+use App\Service\ElasticConnection;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ProductController extends AbstractController
 {
     #[Route('/api/products', name: 'app_product', methods: ['POST'])]
-    public function store(Request $request, EntityManagerInterface $entityManager, #[CurrentUser] ?User $currentUser, ValidatorInterface $validator): JsonResponse
+    public function store(Request $request, EntityManagerInterface $entityManager, #[CurrentUser] ?User $currentUser, ValidatorInterface $validator, ElasticConnection $elastic_client): JsonResponse
     {
         $requestBody = json_decode($request->getContent(), false);
         
@@ -36,6 +37,11 @@ class ProductController extends AbstractController
         
         $entityManager->persist($product);
         $entityManager->flush();
+        
+        $elastic_client->addIndex(
+            $requestBody->name,
+            $product->getId(),
+        );
 
         return $this->json([
             'message' => 'Welcome to your new controller!',
@@ -46,5 +52,6 @@ class ProductController extends AbstractController
             'path' => 'src/Controller/ProductController.php',
         ]);
     }
+
 
 }

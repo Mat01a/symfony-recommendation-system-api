@@ -16,9 +16,6 @@ class ProductControllerTest extends ApiTestCase
         $user = $userRepository->findOneByEmail('test@email.com');
         $client->loginUser($user);
 
-        $product = [
-            "rate" => 3,
-        ];
 
         # Create a product
         $client->request('POST', '/api/products', ['json' => [
