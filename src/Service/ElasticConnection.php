@@ -9,7 +9,7 @@ class ElasticConnection
     private $login;
     private $password;
     private $ca;
-    public function __construct($elasticLogin, $elasticPassword, $elasticCA)
+    public function __construct(string $elasticLogin, string $elasticPassword, string $elasticCA)
     {
         $this->login = $elasticLogin;
         $this->password = $elasticPassword;
