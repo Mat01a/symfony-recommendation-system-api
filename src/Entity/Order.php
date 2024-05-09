@@ -3,47 +3,40 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Put;
-use App\Controller\ProductController;
-use App\Repository\ProductRepository;
+use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ApiResource(operations: [
     new GetCollection(),
-    new Post(
-        name: 'app_product',
-        uriTemplate: '/products',
-        controller: ProductController::class
-    ),
     new Get(
-        uriTemplate: '/products/{id}',
+        uriTemplate: '/orders/{id}',
         requirements: ['id' => '\d+']
     )
-],)]
-class Product
+
+])]
+#[ORM\Table(name: '`order`')]
+class Order
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orders')]
+    private ?User $user = null;
+
     #[ORM\Column]
-    #[Assert\NotBlank(message: "Please enter product name")]
-    private string $name;        
+    private ?\DateTimeImmutable $createdAt = null;
 
     /**
      * @var Collection<int, OrderDetail>
      */
-    #[ORM\OneToMany(targetEntity: OrderDetail::class, mappedBy: 'product')]
+    #[ORM\OneToMany(targetEntity: OrderDetail::class, mappedBy: 'order')]
     private Collection $orderDetails;
 
     public function __construct()
@@ -55,15 +48,27 @@ class Product
     {
         return $this->id;
     }
-    
-    public function getName(): string
+
+    public function getUser(): ?User
     {
-        return $this->name;
+        return $this->user;
     }
 
-    public function setName(string $name): static
+    public function setUser(?User $user): static
     {
-        $this->name = $name;
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -80,7 +85,7 @@ class Product
     {
         if (!$this->orderDetails->contains($orderDetail)) {
             $this->orderDetails->add($orderDetail);
-            $orderDetail->setProduct($this);
+            $orderDetail->setOrder($this);
         }
 
         return $this;
@@ -90,12 +95,11 @@ class Product
     {
         if ($this->orderDetails->removeElement($orderDetail)) {
             // set the owning side to null (unless already changed)
-            if ($orderDetail->getProduct() === $this) {
-                $orderDetail->setProduct(null);
+            if ($orderDetail->getOrder() === $this) {
+                $orderDetail->setOrder(null);
             }
         }
 
         return $this;
     }
-
 }
