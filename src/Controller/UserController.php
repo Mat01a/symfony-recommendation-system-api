@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
-    #[Route('/register', name: 'app_user')]
+    #[Route('/register', name: 'app_user', methods: ['POST'])]
     public function store(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): JsonResponse
     {
         $requestBody = json_decode($request->getContent(), false);
