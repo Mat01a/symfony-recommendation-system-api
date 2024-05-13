@@ -21,6 +21,17 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+    public function findEntityWithoutRelations($name)
+    {
+        return $this->createQueryBuilder('p')
+            ->select(['p.id', 'p.name'])
+            ->andWhere('p.name = :name')
+            ->setParameter('name', $name)
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Product[] Returns an array of Product objects
     //     */
