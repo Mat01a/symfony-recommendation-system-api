@@ -5,6 +5,8 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use App\Controller\OrderController;
 use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,6 +18,11 @@ use Doctrine\ORM\Mapping as ORM;
     new Get(
         uriTemplate: '/orders/{id}',
         requirements: ['id' => '\d+']
+    ),
+    new Post(
+        name: 'app_order',
+        uriTemplate: '/orders',
+        controller: OrderController::class
     )
 
 ])]

@@ -27,6 +27,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     new Get(
         uriTemplate: '/products/{id}',
         requirements: ['id' => '\d+']
+    ),
+    new Get(
+        name: 'app_product_recommendation',
+        uriTemplate: '/products/recommendations/{name}',
+        controller: ProductController::class
     )
 ],)]
 class Product
