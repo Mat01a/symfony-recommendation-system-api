@@ -6,18 +6,16 @@ use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Entity\User;
 use App\Dto\ProductDTO;
+use App\Repository\ProductRepository;
 use App\Service\ElasticConnection;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class ProductController extends AbstractController
 {
     #[Route('/api/products', name: 'app_product', methods: ['POST'])]
-    public function store(Request $request, EntityManagerInterface $entityManager, ElasticConnection $elastic_client, #[MapRequestPayload] ProductDTO $productDTO): JsonResponse
+    public function store(EntityManagerInterface $entityManager, ElasticConnection $elastic_client, #[MapRequestPayload] ProductDTO $productDTO): JsonResponse
     {
 
         $product = new Product();
@@ -32,7 +30,7 @@ class ProductController extends AbstractController
         );
 
         return $this->json([
-            'message' => 'Welcome to your new controller!',
+            'message' => $product->getName() . ' have been added to the database!',
             'new_product' => [
                 'name' => $product->getName()
             ],
@@ -40,5 +38,27 @@ class ProductController extends AbstractController
         ]);
     }
 
+    #[Route('api/products/recommendations/{name}', name: 'app_product_recommendation', methods: ['GET'])]
+    public function showRecommendation(ElasticConnection $elastic_client, string $name, ProductRepository $productRepository): JsonResponse
+    {
+        $response = $elastic_client->getRecommendation(name: $name, field_name: 'products');
+
+        $recommendations = $response['recommendations']['buckets'];
+        $fixedRecommendations = [];
+        foreach($recommendations as $current)
+        {
+            if ($current["key"] !== $name)
+            {
+                $currentName = $current["key"];
+                $currentRecommendation = $productRepository->findEntityWithoutRelations($currentName);
+                array_push($fixedRecommendations, $currentRecommendation);
+            }
+        }
+        return $this->json([
+            "{$name}" => [
+              "often_purchased_with" => $fixedRecommendations
+            ]
+        ]);
+    }
 
 }

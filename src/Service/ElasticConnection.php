@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use Elastic\Elasticsearch\ClientBuilder;
+use Symfony\Component\Serializer\Serializer;
 
 class ElasticConnection
 {
@@ -26,18 +27,17 @@ class ElasticConnection
         return $client;
     }
 
-    public function addIndex(string $name, int $id, string $index = 'product')
+    public function addIndex($data, int $id, string $index = 'order', string $name = 'name')
     {
         # Check if is TEST env, if is change index to test
         if ($_ENV["APP_ENV"] === "test")
-            $index = 'test_product';
+            $index = 'test_'.$index;
 
         $client = $this->connection();
         $params = [
             'index' => $index,
-            'id' => $id,
             'body' => [ 
-                'name' => $name
+                $name => $data
                 ]
         ];
 
@@ -46,6 +46,42 @@ class ElasticConnection
         return $response;
     }
 
+    public function getRecommendation(string $name, string $field_name, string $index = 'order', int $size = 4)
+    {
+        $index = $this->testEnvIndex($index);
+
+        $client = $this->connection();
+
+        $params = [
+            "query" => [
+                "match" => [ "{$field_name}" =>  "{$name}" ]
+            ],
+            "aggs" => [
+                "recommendations" => [
+                    "significant_terms" => [
+                        "field" => "{$field_name}",
+                        "size" => "{$size}",
+                        "min_doc_count" => 1
+                    ]
+                ]
+            ]
+        ];
+
+        $params = [
+            'index' => $index,
+            'body' => $params
+        ];
+        $result = $client->search($params);
+
+        $response = $result['aggregations'];
+        return $response;
+    }
+
+    private function testEnvIndex($index)
+    {
+        if ($_ENV['APP_ENV'] === 'test')
+            return $index = 'test_' . $index;
+    }
 }
 
 ?>

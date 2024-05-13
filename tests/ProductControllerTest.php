@@ -19,8 +19,7 @@ class ProductControllerTest extends ApiTestCase
 
         # Create a product
         $client->request('POST', '/api/products', ['json' => [
-            'name' => 'Test product',
-            "rate" => 5
+            'name' => 'Test product II'
         ]]);
 
 
